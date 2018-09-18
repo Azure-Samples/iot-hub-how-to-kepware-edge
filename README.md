@@ -25,10 +25,16 @@ You will need
 * an Azure IoT Edge device set up as a 'transparent gateway' per the Azure IoT Edge documentation ([linux](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux) or [windows](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-windows)).  Ensure that IoT Edge is set up correctly for secure MQTT communication by running the following command (if Windows, you may have to install [openssl](https://sourceforge.net/projects/openssl/))
 
 ```bash
-openssl s_client -connect [your gateway name]:8883
+openssl s_client -connect [your gateway name]:8883 -CAfile $CERTDIR/certs/azure-iot-test-only.root.ca.cert.pem
 ```
 
-where [your gateway name] is the name you used in the hostname field of your config.yaml file.  If using Windows as a host, you may have to add the -CAfile parameter and give it the path to your root CA cert.  If the bottom of the results of that command shows anything other than "Verify return code: 0 (ok)" (see screenshot below), then you'll need to fix that before moving on
+where [your gateway name] is the name you used in the hostname field of your config.yaml file.  If this does not work, try adding your gateway name and ip address to the hosts file (/etc/hosts on Linux or c:\windows\system32\drivers\etc\hosts on Windows).  In an Azure VM this is the internal, not external ip address.  eg.:
+
+```bash
+10.0.0.10 KepGateway
+```
+
+If the bottom of the results of that command shows anything other than "Verify return code: 0 (ok)" (see screenshot below), then you'll need to fix that before moving on.
 
 ![cert verify](images/cert-verify.png)
 
@@ -122,7 +128,7 @@ With the preliminary work done, we are ready to configure our KepServerEx.
     * Client ID:   [device id]
     * Username:  [iothub long name]/[device id]/api-version=2016-11-14
     * Password:  [SAS Token]
-  * the [iothub long name] is the full name of your IoTHub, including the .azure-devices.net part.  The [SAS Token] is the SAS Token generated and copied above..  Copy/Paste it in here.  On the Username, for IoT Hub the "api-version" parameter was optional, but it is not for IoT Edge.
+  * the [iothub long name] is the full name of your IoTHub, including the .azure-devices.net part.  The [SAS Token] is the SAS Token generated and copied above.  Copy/Paste it in here.  On the Username, for IoT Hub the "api-version" parameter was optional, but it is not for IoT Edge.
   * click "Finish"
 
 Below are a couple of screenshots for comparison. To compare to your entries, right click on the agent you created in the tree view and choose "Properties.."
@@ -141,9 +147,15 @@ Security Tab:
 
 ![client tab](images/kepware-agent-config-security.png)
 
+## Install Java
+
+The Kepware server uses the Java Runtime Engine (JRE) to pull data from the Kepware server.  Install JRE from the link below.
+
+[https://java.com/en/download/](https://java.com/en/download/)
+
 ## Choose tag(s) to send
 
-At this point, you've created an IoT Agent, but it is not yet setup to send any data to IoT Edge. If you click on your newly created agent in the left hand tree view, in the right hand screen you'll see "add IoT item..".  Click on that, then navigate to the tag(s) that you want to send to IoT Hub and add them. For example, the following screenshots show setting up the "Channel1.Device1.Tag1" sample tag that comes with the KepServerEx simulator.
+At this point, you've created an IoT Agent, but it is not yet setup to send any data to IoT Edge. If you click on your newly created agent in the left hand tree view, in the right hand screen you'll see "New IoT Item".  Click on that, then navigate to the tag(s) that you want to send to IoT Hub and add them. For example, the following screenshots show setting up the "Channel1.Device1.Tag1" sample tag that comes with the KepServerEx simulator.
 
 ![sample tag](images/Kepware-sample-tag.png)
 
