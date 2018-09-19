@@ -52,7 +52,7 @@ When Kepware connects to IoT Edge, it will do so with MQTT over TLS.  The Edge H
 * if you used a production certificate from a company like Baltimore, DigiCert, etc to set up your IoT Edge device, or a corporate certificate based on a Certificate Authority(CA) that your KepServerEx will already trust, you can skip this step
   * if you used the dev/test-only [convenience scripts](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux#certificate-creation) provided by the Azure IoT engineering team, you need to copy the Root CA certificate from your IoT Edge box.  You need to get this certificate to a location from which your KepServerEx can read (either copy local to the KepServerEx or a file share it can reach)  
     * If you used the instructions above, this certificate will be located at $CERTDIR/certs/azure-iot-test-only.root.ca.cert.pem  (where $CERTDIR is the directory in which you created your dev/test certificates).  
-  * on the KepServerEx, using the Certificate Manager MMC console, import the IoT Edge Root CA certificate into its "Trust Root Certification Authorities" store.  Make sure you do this for the 'local computer', and not 'personal'.
+  * on the KepServerEx, using the Certificate Manager MMC console, import the IoT Edge Root CA certificate into its "Trust Root Certification Authorities" store.  **Make sure you do this for the 'local computer', and not 'personal'**.
 
 ### Name resolution
 
