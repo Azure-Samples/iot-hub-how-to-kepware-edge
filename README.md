@@ -22,24 +22,9 @@ You will need
 
 * an Azure subscription.  If you do not already have one, you can create an Azure account and subscription with free credits [here](https://azure.microsoft.com/en-ca/free)
 * an IoT Hub.  If you do not already have one, create one via the instructions [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-using-cli#create-an-iot-hub)
-* an Azure IoT Edge device set up as a 'transparent gateway' per the Azure IoT Edge documentation ([linux](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux) or [windows](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-windows)).  Ensure that IoT Edge is set up correctly for secure MQTT communication by running the following command (if Windows, you may have to install [openssl](https://sourceforge.net/projects/openssl/))
-* the Java Runtime Engine (JRE) installed on the Kepware Server.  You can install the JRE from this link:  [https://java.com/en/download/](https://java.com/en/download/)
-
-```bash
-openssl s_client -connect [your gateway name]:8883 -CAfile $CERTDIR/certs/azure-iot-test-only.root.ca.cert.pem
-```
-
-where [your gateway name] is the name you used in the hostname field of your config.yaml file.  If this does not work, try adding your gateway name and ip address to the hosts file (/etc/hosts on Linux or c:\windows\system32\drivers\etc\hosts on Windows).  In an Azure VM this is the internal, not external ip address.  eg.:
-
-```bash
-10.0.0.10 KepGateway
-```
-
-If the bottom of the results of that command shows anything other than "Verify return code: 0 (ok)" (see screenshot below), then you'll need to fix that before moving on.
-
-![cert verify](images/cert-verify.png)
-
+* an Azure IoT Edge device set up as a 'transparent gateway' per the Azure IoT Edge documentation ([linux](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux) or [windows](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-windows)).  
 * a KepServerEx set up and licensed with Kepware's IoT Gateway plug-in
+* the Java Runtime Engine (JRE) installed on the Kepware Server. This is required by the KEPServerEX IoT Gateway. You can install the JRE from this link:  [https://java.com/en/download/](https://java.com/en/download/)
 * Administrative permissions on the KepServerEx (both KepServerEx and the underlying host machine)
 
 ## Environment Setup
@@ -63,6 +48,22 @@ The KepServerEx must also be able to resolve the fully-qualified domain name (FQ
 * if you do not, or just want to test before you do, you can add a hosts file entry on your KepServerEx for your IoT Edge gateway in the c:\windows\system32\drivers\etc\hosts file
 
 Either way, ensure your KepServerEx can 'ping' your IoT Edge gateway device by this FQDN
+
+### Test IoT Edge setup
+
+Ensure that IoT Edge is set up correctly for secure MQTT communication by running the following command (if Windows, you may have to install [openssl](https://sourceforge.net/projects/openssl/))
+
+```bash
+openssl s_client -connect [your gateway name]:8883 -CAfile $CERTDIR/certs/azure-iot-test-only.root.ca.cert.pem
+```
+
+where [your gateway name] is the name you used in the hostname field of your config.yaml file.  
+
+You should be able to run that command from both the IoT Edge device itself, as well as the KEPServerEX server.
+
+If the bottom of the results of that command shows anything other than "Verify return code: 0 (ok)" (see screenshot below), then you'll need to fix that before moving on.
+
+![cert verify](images/cert-verify.png)
 
 ### Register Kepware with IoT Hub
 
