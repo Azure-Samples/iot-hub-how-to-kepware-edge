@@ -1,6 +1,7 @@
 ---
 services: iot-hub, iot-edge, Kepware
 author: stevebus
+reviewer: temandin
 ---
 
 # Azure IoT Edge - How to connect PTC/Kepware's KepServerEx
@@ -19,14 +20,22 @@ Below are the step-by-step instructions for connecting KepServerEx to IoT Hub th
 
 You will need
 
+* an Azure subscription.  If you do not already have one, you can create an Azure account and subscription with free credits [here](https://azure.microsoft.com/en-ca/free)
 * an IoT Hub.  If you do not already have one, create one via the instructions [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-using-cli#create-an-iot-hub)
-* an Azure IoT Edge device set up as a 'transparent gateway' per the Azure IoT Edge documentation ([linux](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux) or [windows](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-windows)).  Ensure that IoT Edge is set up correctly for secure MQTT communication by running the following command (if Windows, you may have to install openssl)
+* an Azure IoT Edge device set up as a 'transparent gateway' per the Azure IoT Edge documentation ([linux](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux) or [windows](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-windows)).  Ensure that IoT Edge is set up correctly for secure MQTT communication by running the following command (if Windows, you may have to install [openssl](https://sourceforge.net/projects/openssl/))
+* the Java Runtime Engine (JRE) installed on the Kepware Server.  You can install the JRE from this link:  [https://java.com/en/download/](https://java.com/en/download/)
 
 ```bash
-openssl s_client -connect [your gateway name]:8883
+openssl s_client -connect [your gateway name]:8883 -CAfile $CERTDIR/certs/azure-iot-test-only.root.ca.cert.pem
 ```
 
-where [your gateway name] is the name you used in the hostname field of your config.yaml file.  If using Windows as a host, you may have to add the -CAfile parameter and give it the path to your root CA cert.  If the bottom of the results of that command shows anything other than "Verify return code: 0 (ok)" (see screenshot below), then you'll need to fix that before moving on
+where [your gateway name] is the name you used in the hostname field of your config.yaml file.  If this does not work, try adding your gateway name and ip address to the hosts file (/etc/hosts on Linux or c:\windows\system32\drivers\etc\hosts on Windows).  In an Azure VM this is the internal, not external ip address.  eg.:
+
+```bash
+10.0.0.10 KepGateway
+```
+
+If the bottom of the results of that command shows anything other than "Verify return code: 0 (ok)" (see screenshot below), then you'll need to fix that before moving on.
 
 ![cert verify](images/cert-verify.png)
 
@@ -44,7 +53,7 @@ When Kepware connects to IoT Edge, it will do so with MQTT over TLS.  The Edge H
 * if you used a production certificate from a company like Baltimore, DigiCert, etc to set up your IoT Edge device, or a corporate certificate based on a Certificate Authority(CA) that your KepServerEx will already trust, you can skip this step
   * if you used the dev/test-only [convenience scripts](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux#certificate-creation) provided by the Azure IoT engineering team, you need to copy the Root CA certificate from your IoT Edge box.  You need to get this certificate to a location from which your KepServerEx can read (either copy local to the KepServerEx or a file share it can reach)  
     * If you used the instructions above, this certificate will be located at $CERTDIR/certs/azure-iot-test-only.root.ca.cert.pem  (where $CERTDIR is the directory in which you created your dev/test certificates).  
-  * on the KepServerEx, using the Certificate Manager MMC console, import the IoT Edge Root CA certificate into its "Trust Root Certification Authorities" store.  Make sure you do this for the 'local computer', and not 'personal'.
+  * on the KepServerEx, using the Certificate Manager MMC console, import the IoT Edge Root CA certificate into its "Trust Root Certification Authorities" store.  **Make sure you do this for the 'local computer', and not 'personal'**.
 
 ### Name resolution
 
@@ -120,7 +129,7 @@ With the preliminary work done, we are ready to configure our KepServerEx.
     * Client ID:   [device id]
     * Username:  [iothub long name]/[device id]/api-version=2016-11-14
     * Password:  [SAS Token]
-  * the [iothub long name] is the full name of your IoTHub, including the .azure-devices.net part.  The [SAS Token] is the SAS Token generated and copied above..  Copy/Paste it in here.  On the Username, for IoT Hub the "api-version" parameter was optional, but it is not for IoT Edge.
+  * the [iothub long name] is the full name of your IoTHub, including the .azure-devices.net part.  The [SAS Token] is the SAS Token generated and copied above.  Copy/Paste it in here.  On the Username, for IoT Hub the "api-version" parameter was optional, but it is not for IoT Edge.
   * click "Finish"
 
 Below are a couple of screenshots for comparison. To compare to your entries, right click on the agent you created in the tree view and choose "Properties.."
@@ -141,7 +150,7 @@ Security Tab:
 
 ## Choose tag(s) to send
 
-At this point, you've created an IoT Agent, but it is not yet setup to send any data to IoT Edge. If you click on your newly created agent in the left hand tree view, in the right hand screen you'll see "add IoT item..".  Click on that, then navigate to the tag(s) that you want to send to IoT Hub and add them. For example, the following screenshots show setting up the "Channel1.Device1.Tag1" sample tag that comes with the KepServerEx simulator.
+At this point, you've created an IoT Agent, but it is not yet setup to send any data to IoT Edge. If you click on your newly created agent in the left hand tree view, in the right hand screen you'll see "New IoT Item".  Click on that, then navigate to the tag(s) that you want to send to IoT Hub and add them. For example, the following screenshots show setting up the "Channel1.Device1.Tag1" sample tag that comes with the KepServerEx simulator.
 
 ![sample tag](images/Kepware-sample-tag.png)
 
