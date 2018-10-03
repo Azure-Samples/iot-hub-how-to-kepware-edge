@@ -8,6 +8,8 @@ reviewer: temandin
 
 These instructions provide the necessary steps to connect PTC/Kepware's KepServerEx to Azure IoT Hub **through** Azure IoT Edge.
 
+> Note: inline images in this sample are not currently showing on the Azure Samples site - to see images and screenshots in this article, visit the github repository by clicking the "Browse on Github" button above
+
 ## Overview
 
 PTC Kepware's KepServerEx is an industry leader in industrial and manufacturing device connectivity. It has connectivity libraries for a vast array of equipment and is a popular choice for unlocking the data from both new and legacy industrial devices. Kepware provides an IoT Gateway module today that, per their own [instructions](https://www.kepware.com/getattachment/c93c65df-57ea-4e9c-a1e0-2e9a34381d54/mqtt-client-and-microsoft-azure-iot.pdf), can be used to connect to and send data to Azure IoT Hub over the MQTT protocol.  
