@@ -93,7 +93,7 @@ where [device id] is the name you want to use for your IoT Edge (e.g. iotKepware
 * Finally, we need to generate a security token (called a "SAS token") for our device.  This will be used as the "password" for the KepServerEx to connect to IoT Hub/IoT Edge.  To create the SAS token, run
 
 ```bash
-az iot hub generate-sas-token --device-id [device id] --hub-name [hub name] --duraction [duration in seconds]
+az iot hub generate-sas-token --device-id [device id] --hub-name [hub name] --duration [duration in seconds]
 ```
 
 where [device id] is the name of the device you just created, [hub name] is the short-name of your IoT Hub, and [duration in seconds] is the duration, in seconds, that you want your SAS Token to be valid.  For security purposes, Microsoft recommends periodically 'rolling' the SAS token by generating a new one and updating your KepServerEx on a schedule you feel balances security with administrative overhead.  Either way, make note of the duration, as you'll need to update the SAS token before the expiration or your KepServerEx will no longer be able to authenticate to IoT Edge.
