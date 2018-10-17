@@ -1,22 +1,22 @@
 ---
-services: iot-hub, iot-edge, Kepware, KepServerEX
+services: iot-hub, iot-edge, Kepware, KEPServerEX
 author: stevebus
 reviewer: temandin
 ---
 
-# Azure IoT Edge - How to connect PTC/Kepware's KepServerEX
+# Azure IoT Edge - How to connect PTC/Kepware's KEPServerEX
 
-These instructions provide the necessary steps to connect PTC/Kepware's KepServerEX to Azure IoT Hub **through** Azure IoT Edge.
+These instructions provide the necessary steps to connect PTC/Kepware's KEPServerEX to Azure IoT Hub **through** Azure IoT Edge.
 
 > Note: inline images in this sample are not currently showing on the Azure Samples site - to see images and screenshots in this article, visit the github repository by clicking the "Browse on Github" button above
 
 ## Overview
 
-PTC/Kepware's KepServerEX is an industry leader in industrial and manufacturing device connectivity. It has connectivity libraries for a vast array of equipment and is a popular choice for unlocking the data from both new and legacy industrial devices. Kepware provides an [IoT Gateway](https://www.kepware.com/en-us/products/kepserverex/advanced-plug-ins/iot-gateway/) module today that, per their own [instructions](https://www.kepware.com/getattachment/c93c65df-57ea-4e9c-a1e0-2e9a34381d54/mqtt-client-and-microsoft-azure-iot.pdf), can be used to connect to and send data to Azure IoT Hub over the MQTT protocol.  
+PTC/Kepware's KEPServerEX is an industry leader in industrial and manufacturing device connectivity. It has connectivity libraries for a vast array of equipment and is a popular choice for unlocking the data from both new and legacy industrial devices. Kepware provides an [IoT Gateway](https://www.kepware.com/en-us/products/KEPServerEX/advanced-plug-ins/iot-gateway/) module today that, per their own [instructions](https://www.kepware.com/getattachment/c93c65df-57ea-4e9c-a1e0-2e9a34381d54/mqtt-client-and-microsoft-azure-iot.pdf), can be used to connect to and send data to Azure IoT Hub over the MQTT protocol.  
 
-Many customers have expressed a desire to be able to send the data from KepServerEX through Azure IoT Edge. That allows both for Edge to act as a gatewey through which traffic must flow, thus isolating the KepServerEX further from the Internet, as well as the ability to take advantage of the many IoT Edge capabilities for pre-processing that data on the edge. Examples include the ability to use custom modules or Azure Functions to transform the data, Azure Streaming Analytics to do filtering and aggregation of the data before it goes to the cloud, and Azure Machine Learning for making predictions on the edge, potentially without having to send all of the detailed data to the cloud.
+Many customers have expressed a desire to be able to send the data from KEPServerEX through Azure IoT Edge. That allows both for Edge to act as a gatewey through which traffic must flow, thus isolating the KEPServerEX further from the Internet, as well as the ability to take advantage of the many IoT Edge capabilities for pre-processing that data on the edge. Examples include the ability to use custom modules or Azure Functions to transform the data, Azure Streaming Analytics to do filtering and aggregation of the data before it goes to the cloud, and Azure Machine Learning for making predictions on the edge, potentially without having to send all of the detailed data to the cloud.
 
-Below are the step-by-step instructions for connecting KepServerEX to IoT Hub through IoT Edge
+Below are the step-by-step instructions for connecting KEPServerEX to IoT Hub through IoT Edge
 
 ## Prerequisites
 
@@ -25,31 +25,31 @@ You will need
 * an Azure subscription.  If you do not already have one, you can create an Azure account and subscription with free credits [here](https://azure.microsoft.com/en-ca/free)
 * an IoT Hub.  If you do not already have one, create one via the instructions [here](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-using-cli#create-an-iot-hub)
 * an Azure IoT Edge device set up as a 'transparent gateway' per the Azure IoT Edge documentation ([linux](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux) or [windows](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-windows)).  
-* a KepServerEX set up and licensed with the [IoT Gateway](https://www.kepware.com/en-us/products/kepserverex/advanced-plug-ins/iot-gateway/) plug-in
-* the Java Runtime Engine (JRE) installed on the KepServerEX server. This is required by the KepServerEX IoT Gateway. You can install the JRE from this link:  [https://java.com/en/download/](https://java.com/en/download/)
-* Administrative permissions on the KepServerEX (both KepServerEX and the underlying host machine)
+* a KEPServerEX set up and licensed with the [IoT Gateway](https://www.kepware.com/en-us/products/KEPServerEX/advanced-plug-ins/iot-gateway/) plug-in
+* the Java Runtime Engine (JRE) installed on the KEPServerEX server. This is required by the KEPServerEX IoT Gateway. You can install the JRE from this link:  [https://java.com/en/download/](https://java.com/en/download/)
+* Administrative permissions on the KEPServerEX (both KEPServerEX and the underlying host machine)
 
 ## Environment Setup
 
-Before configuring KepServerEX, we need to take a few environmental setup steps.  
+Before configuring KEPServerEX, we need to take a few environmental setup steps.  
 
 ### Certificates
 
-When KepServerEX connects to IoT Edge, it will do so with MQTT over TLS.  The Edge Hub module will provide it with a server certificate for the TLS connection and the KepServerEX must trust that certificate.
+When KEPServerEX connects to IoT Edge, it will do so with MQTT over TLS.  The Edge Hub module will provide it with a server certificate for the TLS connection and the KEPServerEX must trust that certificate.
 
-* if you used a production certificate from a company like Baltimore, DigiCert, etc to set up your IoT Edge device, or a corporate certificate based on a Certificate Authority(CA) that your KepServerEX will already trust, you can skip this step
-  * if you used the dev/test-only [convenience scripts](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux#certificate-creation) provided by the Azure IoT engineering team, you need to copy the Root CA certificate from your IoT Edge box.  You need to get this certificate to a location from which your KepServerEX can read (either copy local to the KepServerEX or a file share it can reach)  
+* if you used a production certificate from a company like Baltimore, DigiCert, etc to set up your IoT Edge device, or a corporate certificate based on a Certificate Authority(CA) that your KEPServerEX will already trust, you can skip this step
+  * if you used the dev/test-only [convenience scripts](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-create-transparent-gateway-linux#certificate-creation) provided by the Azure IoT engineering team, you need to copy the Root CA certificate from your IoT Edge box.  You need to get this certificate to a location from which your KEPServerEX can read (either copy local to the KEPServerEX or a file share it can reach)  
     * If you used the instructions above, this certificate will be located at $CERTDIR/certs/azure-iot-test-only.root.ca.cert.pem  (where $CERTDIR is the directory in which you created your dev/test certificates).  
-  * on the KepServerEX, using the Certificate Manager MMC console, import the IoT Edge Root CA certificate into its "Trust Root Certification Authorities" store.  **Make sure you do this for the 'local computer', and not 'personal'**.
+  * on the KEPServerEX, using the Certificate Manager MMC console, import the IoT Edge Root CA certificate into its "Trust Root Certification Authorities" store.  **Make sure you do this for the 'local computer', and not 'personal'**.
 
 ### Name resolution
 
-The KepServerEX must also be able to resolve the fully-qualified domain name (FQDN) of the IoT Edge gateway to its IP address.  This FQDN **must** match the hostname parameter used in your IoT Edge device's config.yaml file.
+The KEPServerEX must also be able to resolve the fully-qualified domain name (FQDN) of the IoT Edge gateway to its IP address.  This FQDN **must** match the hostname parameter used in your IoT Edge device's config.yaml file.
 
-* if you have DNS infrastructure services available in the environment in which your KepServerEX runs, add a DNS entry for your IoT Edge gateway
-* if you do not, or just want to test before you do, you can add a hosts file entry on your KepServerEX for your IoT Edge gateway in the c:\windows\system32\drivers\etc\hosts file
+* if you have DNS infrastructure services available in the environment in which your KEPServerEX runs, add a DNS entry for your IoT Edge gateway
+* if you do not, or just want to test before you do, you can add a hosts file entry on your KEPServerEX for your IoT Edge gateway in the c:\windows\system32\drivers\etc\hosts file
 
-Either way, ensure your KepServerEX can 'ping' your IoT Edge gateway device by this FQDN
+Either way, ensure your KEPServerEX can 'ping' your IoT Edge gateway device by this FQDN
 
 ### Test IoT Edge setup
 
@@ -61,15 +61,15 @@ openssl s_client -connect [your gateway name]:8883 -CAfile $CERTDIR/certs/azure-
 
 where [your gateway name] is the name you used in the hostname field of your config.yaml file.  
 
-You should be able to run that command from both the IoT Edge device itself, as well as the KepServerEX server.
+You should be able to run that command from both the IoT Edge device itself, as well as the KEPServerEX server.
 
 If the bottom of the results of that command shows anything other than "Verify return code: 0 (ok)" (see screenshot below), then you'll need to fix that before moving on.
 
 ![cert verify](images/cert-verify.png)
 
-### Register KepServerEX with IoT Hub
+### Register KEPServerEX with IoT Hub
 
-Even through KepServerEX will be physically connecting to IoT Hub via the IoT Edge gateway, it will still authenticate through to IoT Hub.  In order to do so, IoT Hub needs to know about the KepServerEX IoT Gateway agent.  To do this, we create an IoT Device in IoT Hub to represent our KepServerEX agent.
+Even through KEPServerEX will be physically connecting to IoT Hub via the IoT Edge gateway, it will still authenticate through to IoT Hub.  In order to do so, IoT Hub needs to know about the KEPServerEX IoT Gateway agent.  To do this, we create an IoT Device in IoT Hub to represent our KEPServerEX agent.
 
 To do this,
 
@@ -84,7 +84,7 @@ To do this,
 az extension add --name azure-cli-iot-ext
 ```
 
-* once installed, create your IoT Device to represent your KepServerEX
+* once installed, create your IoT Device to represent your KEPServerEX
 
  ```bash
  az iot hub device-identity create --device-id [device id] --hub-name [hub name]
@@ -92,27 +92,27 @@ az extension add --name azure-cli-iot-ext
 
 where [device id] is the name you want to use for your IoT Edge (e.g. iotKepware01) and the [hub name] is the short-name of your IoT Hub (e.g. sdbedgeIoTHub)
 
-* Finally, we need to generate a security token (called a "SAS token") for our device.  This will be used as the "password" for the KepServerEX to connect to IoT Hub/IoT Edge.  To create the SAS token, run
+* Finally, we need to generate a security token (called a "SAS token") for our device.  This will be used as the "password" for the KEPServerEX to connect to IoT Hub/IoT Edge.  To create the SAS token, run
 
 ```bash
 az iot hub generate-sas-token --device-id [device id] --hub-name [hub name] --duration [duration in seconds]
 ```
 
-where [device id] is the name of the device you just created, [hub name] is the short-name of your IoT Hub, and [duration in seconds] is the duration, in seconds, that you want your SAS Token to be valid.  For security purposes, Microsoft recommends periodically 'rolling' the SAS token by generating a new one and updating your KepServerEX on a schedule you feel balances security with administrative overhead.  Either way, make note of the duration, as you'll need to update the SAS token before the expiration or your KepServerEX will no longer be able to authenticate to IoT Edge.
+where [device id] is the name of the device you just created, [hub name] is the short-name of your IoT Hub, and [duration in seconds] is the duration, in seconds, that you want your SAS Token to be valid.  For security purposes, Microsoft recommends periodically 'rolling' the SAS token by generating a new one and updating your KEPServerEX on a schedule you feel balances security with administrative overhead.  Either way, make note of the duration, as you'll need to update the SAS token before the expiration or your KEPServerEX will no longer be able to authenticate to IoT Edge.
 
 A valid SAS token will look similar to the following (with [device id] and [hub name] filled in with your values):
 
 SharedAccessSignature sr=[hub name].azure-devices.net%2Fdevices%2F[device id]&sig=zxiTWD2bGOk0ea66FXwFaNO7cboAQSM3OM3u2UNW5T4%3D&se=1567020425
 
-* Copy your generated SAS Token somewhere from which you can paste it later into your KepServerEX's configuration.  
+* Copy your generated SAS Token somewhere from which you can paste it later into your KEPServerEX's configuration.  
 
-> NOTE:  in the Kepware [instructions](https://www.kepware.com/getattachment/c93c65df-57ea-4e9c-a1e0-2e9a34381d54/mqtt-client-and-microsoft-azure-iot.pdf) for connecting KepServerEX directly to IoT Hub, you may note that there is an option for authenticating to IoT Hub via a self-signed certificate. Today, for IoT Edge, SAS Token authentication is the only option. This may change in the future.
+> NOTE:  in the Kepware [instructions](https://www.kepware.com/getattachment/c93c65df-57ea-4e9c-a1e0-2e9a34381d54/mqtt-client-and-microsoft-azure-iot.pdf) for connecting KEPServerEX directly to IoT Hub, you may note that there is an option for authenticating to IoT Hub via a self-signed certificate. Today, for IoT Edge, SAS Token authentication is the only option. This may change in the future.
 
-## KepServerEX Configuration
+## KEPServerEX Configuration
 
-With the preliminary work done, we are ready to configure our KepServerEX.  
+With the preliminary work done, we are ready to configure our KEPServerEX.  
 
-* In the KepServerEX Configuration Tool, expand the tree view on the left
+* In the KEPServerEX Configuration Tool, expand the tree view on the left
 * right-click on IoT Gateway and choose "Add Agent".  This opens a wizard for creating a new IoT Gateway Agent
 
 * on the "New Agent" screen
@@ -124,7 +124,7 @@ With the preliminary work done, we are ready to configure our KepServerEX.
   * enter the following values
     * URL:   ssl://[iot edge device FQDN]:8883
     * Topic:  devices/[device id]/messages/events/
-  * note that the url protocol was changed from tcp:// to ssl://.  The [iot edge device fqdn] is the hostname of your IoT Edge device.  The [device id] is the device id you created above to represent your KepServerEX server in IoT Hub.  On the topic, **please note the trailing slash and include it**
+  * note that the url protocol was changed from tcp:// to ssl://.  The [iot edge device fqdn] is the hostname of your IoT Edge device.  The [device id] is the device id you created above to represent your KEPServerEX server in IoT Hub.  On the topic, **please note the trailing slash and include it**
   * leave the remaining defaults and click Next
 
 * On the MQTT Client - Security screen
@@ -153,7 +153,7 @@ Security Tab:
 
 ## Choose tag(s) to send
 
-At this point, you've created an IoT Agent, but it is not yet setup to send any data to IoT Edge. If you click on your newly created agent in the left hand tree view, in the right hand screen you'll see "New IoT Item".  Click on that, then navigate to the tag(s) that you want to send to IoT Hub and add them. For example, the following screenshots show setting up the "Channel1.Device1.Tag1" sample tag that comes with the KepServerEX simulator.
+At this point, you've created an IoT Agent, but it is not yet setup to send any data to IoT Edge. If you click on your newly created agent in the left hand tree view, in the right hand screen you'll see "New IoT Item".  Click on that, then navigate to the tag(s) that you want to send to IoT Hub and add them. For example, the following screenshots show setting up the "Channel1.Device1.Tag1" sample tag that comes with the KEPServerEX simulator.
 
 ![sample tag](images/Kepware-sample-tag.png)
 
@@ -163,11 +163,11 @@ At this point, you've created an IoT Agent, but it is not yet setup to send any 
 
 Now that we are set up, let's validate everything is working.
 
-* On the KepServerEX Configuration Tool, in the eventlog at the bottom, you should see a successful connection to your IoT Edge device similar to this
+* On the KEPServerEX Configuration Tool, in the eventlog at the bottom, you should see a successful connection to your IoT Edge device similar to this
 
 ![Kepware logs success](images/kepware-logs-successful.png)
 
-* On the IoT Edge device, in the Edge Hub logs you should see a successful connection from the IoT Device that represents your KepServerEX server.
+* On the IoT Edge device, in the Edge Hub logs you should see a successful connection from the IoT Device that represents your KEPServerEX server.
 
 To view the logs, run this command.
 
@@ -189,7 +189,7 @@ After a few seconds, you should see messages similar to the below start flowing 
 
 ## Next Steps
 
-Congratulations!  You've connected your KepServerEX server through IoT Edge to IoT Hub.  Now you can start adding in the additional capabilities of IoT Edge to process the data on the Edge.
+Congratulations!  You've connected your KEPServerEX server through IoT Edge to IoT Hub.  Now you can start adding in the additional capabilities of IoT Edge to process the data on the Edge.
 
 This is where your imagination can take over, but a few ideas from other customers
 
