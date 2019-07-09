@@ -1,7 +1,25 @@
 ---
-services: iot-hub, iot-edge, Kepware, KEPServerEX
+topic: sample
+languages:
+  - azurecli
+  - csharp
+  - nodejs
+  - python
+  - c
+  - java
+products:
+  - azure-iot-edge
+  - azure-iot-hub
+  - azure-iot-central
 author: stevebus
-reviewer: temandin
+ms.author: stevebus
+ms.date: 07/09/2019
+ms.service: 
+  - azure-iot-edge
+  - azure-iot-hub
+  - azure-iot-central
+ms.topic: sample
+title: How to connect Kepware KEPServerEX to Azure IoT Edge
 ---
 
 # Azure IoT Edge - How to connect PTC/Kepware's KEPServerEX
@@ -49,7 +67,9 @@ The KEPServerEX must also be able to resolve the fully-qualified domain name (FQ
 * if you have DNS infrastructure services available in the environment in which your KEPServerEX runs, add a DNS entry for your IoT Edge gateway
 * if you do not, or just want to test before you do, you can add a hosts file entry on your KEPServerEX for your IoT Edge gateway in the c:\windows\system32\drivers\etc\hosts file
 
-Either way, ensure your KEPServerEX can 'ping' your IoT Edge gateway device by this FQDN
+Either way, ensure your KEPServerEX can 'ping' your IoT Edge gateway device by this FQDN.
+
+Alternately, you can reference the IoT Edge gateway by its IP address instead.  If you do, however, make sure that you update the 'hostname' property in config.yaml to be the IP address of the gateway and not its name.  Remember, the 'hostname' in config.yaml has to match whatever name you use from clients to connect to it **exactly**, whether it's a FQDN or the IP address.  Otherwise the TLS certificate will not validate.
 
 ### Test IoT Edge setup
 
