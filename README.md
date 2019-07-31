@@ -1,5 +1,5 @@
 ---
-topic: sample
+page_type: sample
 languages:
   - azurecli
   - csharp
@@ -11,15 +11,9 @@ products:
   - azure-iot-edge
   - azure-iot-hub
   - azure-iot-central
-author: stevebus
-ms.author: stevebus
-ms.date: 07/09/2019
-ms.service: 
-  - azure-iot-edge
-  - azure-iot-hub
-  - azure-iot-central
-ms.topic: sample
-title: How to connect Kepware KEPServerEX to Azure IoT Edge
+name: "How to connect Kepware KEPServerEX to Azure IoT Edge"
+urlFragment: azure-iot-edge-connect-ptc
+description: "These sample provides the necessary steps to connect PTC/Kepware's KEPServerEX to Azure IoT Hub through Azure IoT Edge."
 ---
 
 # Azure IoT Edge - How to connect PTC/Kepware's KEPServerEX
