@@ -144,7 +144,7 @@ With the preliminary work done, we are ready to configure our KEPServerEX.
 * On the MQTT Client - Security screen
   * enter the following values
     * Client ID:   [device id]
-    * Username:  [iothub long name]/[device id]/api-version=2016-11-14
+    * Username:  [iothub long name]/[device id]/?api-version=2016-11-14
     * Password:  [SAS Token]
   * the [iothub long name] is the full name of your IoTHub, including the .azure-devices.net part.  The [SAS Token] is the SAS Token generated and copied above.  Copy/Paste it in here.  On the Username, for IoT Hub the "api-version" parameter was optional, but it is not for IoT Edge.
   * click "Finish"
